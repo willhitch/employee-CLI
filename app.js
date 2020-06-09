@@ -9,39 +9,135 @@ const OUTPUT_DIR = path.resolve(__dirname, "output")
 const outputPath = path.join(OUTPUT_DIR, "team.html")
 
 const render = require("./lib/htmlRenderer")
+const employee = []
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
-inquirer
-  .prompt([
-    {
-      type: "input",
-      name: "id",
-      message: "What is the Employee's ID?",
-    },
-    {
-      type: "input",
-      name: "name",
-      message: "What is the Employee's name?",
-    },
-    {
-      type: "input",
-      name: "email",
-      message: "What is the Employee's email?",
-    },
-    {
-      type: "checkbox",
-      name: "role",
-      message: "What is the Employee's role at your institution?",
-      choices: ["Employee", "Engineer", "Intern", "Manager"],
-    },
-    {
-      type: "confirm",
-      name: "makeNewEmployee",
-      message: "Would you like to create another Employee?",
-    },
-  ])
-  .then((data) => {})
+function init() {
+  inquirer
+    .prompt([
+      {
+        type: "checkbox",
+        name: "role",
+        message: "What kind of Employee would you like to create?",
+        choices: ["Engineer", "Intern", "Manager", "I'm Done"],
+      },
+    ])
+    .then((data) => {
+      switch (data.role[0]) {
+        case "Engineer":
+          makeEngineer()
+          break
+        case "Intern":
+          makeIntern()
+          break
+        case "Manager":
+          makeManager()
+          break
+        case "I'm Done":
+          makeTeam()
+          break
+      }
+    })
+}
+
+function makeEngineer() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "id",
+        message: "What is the Engineer's ID?",
+      },
+      {
+        type: "input",
+        name: "name",
+        message: "What is the Engineer's name?",
+      },
+      {
+        type: "input",
+        name: "email",
+        message: "What is the Engineer's email?",
+      },
+      {
+        type: "input",
+        name: "github",
+        message: "What is the Engineer's Github username?",
+      },
+    ])
+    .then((data) => {
+      const e = new Engineer(data.name, data.id, data.email, data.github)
+      employee.push(e)
+      init()
+    })
+}
+
+function makeIntern() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "id",
+        message: "What is the Interns's ID?",
+      },
+      {
+        type: "input",
+        name: "name",
+        message: "What is the Interns's name?",
+      },
+      {
+        type: "input",
+        name: "email",
+        message: "What is the Interns's email?",
+      },
+      {
+        type: "input",
+        name: "school",
+        message: "What school did this Intern attend?",
+      },
+    ])
+    .then((data) => {
+      const i = new Intern(data.name, data.id, data.email, data.school)
+      employee.push(i)
+      init()
+    })
+}
+
+function makeManager() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "id",
+        message: "What is the Manager's ID?",
+      },
+      {
+        type: "input",
+        name: "name",
+        message: "What is the Manager's name?",
+      },
+      {
+        type: "input",
+        name: "email",
+        message: "What is the Manager's email?",
+      },
+      {
+        type: "input",
+        name: "officeNumber",
+        message: "What is this Manager's office number?",
+      },
+    ])
+    .then((data) => {
+      const m = new Manager(data.name, data.id, data.email, data.officeNumber)
+      employee.push(m)
+      init()
+    })
+}
+
+function makeTeam() {
+  fs.mkdirSync(OUTPUT_DIR)
+  fs.writeFileSync(outputPath, render(employee))
+}
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
@@ -62,3 +158,6 @@ inquirer
 // for further information. Be sure to test out each class and verify it generates an
 // object with the correct structure and methods. This structure will be crucial in order
 // for the provided `render` function to work! ```
+
+// Start Prompt
+init()
